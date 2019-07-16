@@ -1,5 +1,6 @@
 import { graphql } from "gatsby"
 import React from "react"
+import ReactHtmlParser, { processNodes, convertNodeToElement, htmlparser2 } from 'react-html-parser';
 import Img from "gatsby-image"
 
 import Layout from "../layouts"
@@ -9,6 +10,7 @@ import constants from "../utils/constants"
 
 const RecipeTemplate = ({ data }) => (
   <Layout>
+    {console.log(JSON.stringify(data.nodeRecipe.relationships.field_recipe_category[0].name))}
     <div
       css={{
         background: constants.paleYellow,
@@ -18,9 +20,10 @@ const RecipeTemplate = ({ data }) => (
       }}
     >
       <Container>
-        <h1>{data.recipes.title}</h1>
+        <h1>{data.nodeRecipe.title}</h1>
         <p>
-          <strong>Category:</strong> {data.recipes.relationships.category.name}
+          <strong>Category: </strong>
+          {data.nodeRecipe.relationships.field_recipe_category[0].name}
         </p>
         <div
           css={{
@@ -32,8 +35,7 @@ const RecipeTemplate = ({ data }) => (
           <div css={{ width: `calc(1/2*100% - (1 - 1/2) * ${rhythm(2)})` }}>
             <Img
               fluid={
-                data.recipes.relationships.image.relationships.imageFile
-                  .localFile.childImageSharp.fluid
+                data.nodeRecipe.relationships.field_image.localFile.childImageSharp.fluid
               }
             />
           </div>
@@ -41,15 +43,15 @@ const RecipeTemplate = ({ data }) => (
             <div>
               <strong>Preparation time:</strong>
             </div>
-            <div>{data.recipes.preparationTime} minutes</div>
+            <div>{data.nodeRecipe.field_preparation_time} minutes</div>
             <div>
               <strong>Cooking time:</strong>
             </div>
-            <div>{data.recipes.totalTime} minutes</div>
+            <div>{data.nodeRecipe.field_cooking_time} minutes</div>
             <div>
               <strong>Difficulty:</strong>
             </div>
-            <div>{data.recipes.difficulty}</div>
+            <div>{data.nodeRecipe.field_difficulty}</div>
           </div>
         </div>
         <div css={{ background: `white`, padding: rhythm(1.5) }}>
@@ -58,8 +60,8 @@ const RecipeTemplate = ({ data }) => (
             <div css={{ width: `calc(1/2*100% - (1 - 1/2) * ${rhythm(1.5)})` }}>
               <h3>Ingredients</h3>
               <ul>
-                {data.recipes.ingredients &&
-                  data.recipes.ingredients.map((ing, index) => (
+                {data.nodeRecipe.field_ingredients &&
+                  data.nodeRecipe.field_ingredients.map((ing, index) => (
                     <li key={index}>{ing}</li>
                   ))}
               </ul>
@@ -67,10 +69,9 @@ const RecipeTemplate = ({ data }) => (
             <div css={{ width: `calc(1/2*100% - (1 - 1/2) * ${rhythm(1.5)})` }}>
               <h3>Method</h3>
               <ul>
-                {data.recipes.instructions &&
-                  data.recipes.instructions
-                    .split(`,`)
-                    .map(i => <li key={i}>{i}</li>)}
+                {data.nodeRecipe.field_recipe_instruction.processed &&
+                  ReactHtmlParser(data.nodeRecipe.field_recipe_instruction.processed)
+                }
               </ul>
             </div>
           </div>
@@ -84,26 +85,27 @@ export default RecipeTemplate
 
 export const query = graphql`
   query($slug: String!) {
-    recipes(fields: { slug: { eq: $slug } }) {
+    nodeRecipe(path: { alias: { eq: $slug } }) {
       title
-      preparationTime
-      difficulty
-      totalTime
-      ingredients
-      instructions
+      field_preparation_time
+      field_difficulty
+      # totalTime
+      field_cooking_time
+      field_ingredients
+      # instructions
+      field_recipe_instruction {
+        processed
+        value
+      }
       relationships {
-        category {
+        field_recipe_category {
           name
         }
-        image {
-          relationships {
-            imageFile {
-              localFile {
-                childImageSharp {
-                  fluid(maxWidth: 470, maxHeight: 353) {
-                    ...GatsbyImageSharpFluid
-                  }
-                }
+        field_image {
+          localFile {
+            childImageSharp {
+              fluid(maxWidth: 740, maxHeight: 555) {
+                ...GatsbyImageSharpFluid
               }
             }
           }

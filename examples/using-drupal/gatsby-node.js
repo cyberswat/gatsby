@@ -3,8 +3,9 @@ const path = require(`path`)
 // Create a slug for each recipe and set it as a field on the node.
 exports.onCreateNode = ({ node, getNode, actions }) => {
   const { createNodeField } = actions
-  if (node.internal.type === `recipes`) {
-    const slug = `/recipes/${node.internalId}/`
+  // console.log(JSON.stringify(node.internal));
+  if (node.internal.type === `node__recipe`) {
+    const slug = `/recipes/${node.path.alias}/`
     createNodeField({
       node,
       name: `slug`,
@@ -23,12 +24,12 @@ exports.createPages = ({ actions, graphql }) => {
   return graphql(
     `
       {
-        allRecipes {
+        allNodeRecipe {
           edges {
             node {
-              internalId
-              fields {
-                slug
+              drupal_internal__nid
+              path {
+                alias
               }
             }
           }
@@ -41,12 +42,12 @@ exports.createPages = ({ actions, graphql }) => {
     }
 
     // Create pages for each recipe.
-    result.data.allRecipes.edges.forEach(({ node }) => {
+    result.data.allNodeRecipe.edges.forEach(({ node }) => {
       createPage({
-        path: node.fields.slug,
+        path: node.path.alias,
         component: recipeTemplate,
         context: {
-          slug: node.fields.slug,
+          slug: node.path.alias,
         },
       })
     })

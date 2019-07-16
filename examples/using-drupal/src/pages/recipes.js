@@ -9,9 +9,9 @@ const AllRecipes = ({ data }) => (
     <Container>
       <h1>Recipes</h1>
       <ul>
-        {data.allRecipes.edges.map(({ node }) => (
-          <li key={node.fields.slug}>
-            <Link to={node.fields.slug}>{node.title}</Link>
+        {data.allNodeRecipe.edges.map(({ node }) => (
+          <li key={node.path.alias}>
+            <Link to={node.path.alias}>{node.title}</Link>
           </li>
         ))}
       </ul>
@@ -23,12 +23,12 @@ export default AllRecipes
 
 export const query = graphql`
   query {
-    allRecipes(limit: 1000) {
+    allNodeRecipe(limit: 1000) {
       edges {
         node {
           title
-          fields {
-            slug
+          path {
+            alias
           }
         }
       }

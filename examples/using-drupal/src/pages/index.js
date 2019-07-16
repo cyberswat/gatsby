@@ -21,7 +21,7 @@ class IndexPage extends React.Component {
 
     const FirstPromoted = ({ recipe }) => (
       <Link
-        to={recipe.fields.slug}
+        to={recipe.path.alias}
         css={{
           display: `block`,
           color: `inherit`,
@@ -52,10 +52,7 @@ class IndexPage extends React.Component {
           <h2>{recipe.title}</h2>
         </div>
         <Img
-          fluid={
-            recipe.relationships.image.relationships.imageFile.localFile
-              .childImageSharp.fluid
-          }
+          fluid={recipe.relationships.field_image.localFile.childImageSharp.fluid}
         />
       </Link>
     )
@@ -67,7 +64,7 @@ class IndexPage extends React.Component {
       marginBottom = rhythm(1 / 2),
     }) => (
       <Link
-        to={recipe.fields.slug}
+        to={recipe.path.alias}
         css={{
           color: `inherit`,
           textDecoration: `none`,
@@ -81,19 +78,16 @@ class IndexPage extends React.Component {
       >
         <Img
           fluid={
-            recipe.relationships.image.relationships.imageFile.localFile
-              .childImageSharp.fluid
+            recipe.relationships.field_image.localFile.childImageSharp.fluid
           }
         />
         <div
           css={{
             padding: `${rhythm(3 / 4)} ${rhythm(1)}`,
             width:
-              recipe.relationships.image.relationships.imageFile.localFile
-                .childImageSharp.fluid.width,
+              recipe.relationships.field_image.localFile.childImageSharp.fluid.width,
             height: square
-              ? recipe.relationships.image.relationships.imageFile.localFile
-                  .childImageSharp.fluid.height
+              ? recipe.relationships.field_image.localFile.childImageSharp.fluid.height
               : undefined,
           }}
         >
@@ -105,7 +99,7 @@ class IndexPage extends React.Component {
               color: gray(50),
             }}
           >
-            {recipe.relationships.category.name}
+            {recipe.relationships.field_recipe_category.name}
           </h4>
           <h3>{recipe.title}</h3>
         </div>
@@ -131,7 +125,7 @@ class IndexPage extends React.Component {
                   square={true}
                   columns={4}
                   marginBottom={0}
-                  key={recipe.fields.slug}
+                  key={recipe.path.alias}
                 />
               ))}
             </div>
@@ -190,7 +184,7 @@ class IndexPage extends React.Component {
                 <PromotedCard
                   recipe={recipe}
                   columns={2}
-                  key={recipe.fields.slug}
+                  key={recipe.path.alias}
                 />
               ))}
             </div>
@@ -220,23 +214,19 @@ export default IndexPage
 
 export const pageQuery = graphql`
   query {
-    topRecipe: allRecipes(sort: { fields: [createdAt] }, limit: 1) {
+    topRecipe: allNodeRecipe(sort: { fields: [created] }, limit: 1) {
       edges {
         node {
           title
-          fields {
-            slug
+          path {
+            alias
           }
           relationships {
-            image {
-              relationships {
-                imageFile {
-                  localFile {
-                    childImageSharp {
-                      fluid(maxWidth: 740, maxHeight: 555) {
-                        ...GatsbyImageSharpFluid
-                      }
-                    }
+            field_image {
+              localFile {
+                childImageSharp {
+                  fluid(maxWidth: 740, maxHeight: 555) {
+                    ...GatsbyImageSharpFluid
                   }
                 }
               }
@@ -245,30 +235,26 @@ export const pageQuery = graphql`
         }
       }
     }
-    nextTwoPromotedRecipes: allRecipes(
-      sort: { fields: [createdAt] }
+    nextTwoPromotedRecipes: allNodeRecipe(
+      sort: { fields: [created] }
       limit: 2
       skip: 1
     ) {
       edges {
         node {
           title
-          fields {
-            slug
+          path {
+            alias
           }
           relationships {
-            category {
+            field_recipe_category {
               name
             }
-            image {
-              relationships {
-                imageFile {
-                  localFile {
-                    childImageSharp {
-                      fluid(maxWidth: 240, maxHeight: 240) {
-                        ...GatsbyImageSharpFluid
-                      }
-                    }
+            field_image {
+              localFile {
+                childImageSharp {
+                  fluid(maxWidth: 240, maxHeight: 240) {
+                    ...GatsbyImageSharpFluid
                   }
                 }
               }
@@ -277,30 +263,26 @@ export const pageQuery = graphql`
         }
       }
     }
-    nextFourPromotedRecipes: allRecipes(
-      sort: { fields: [createdAt] }
+    nextFourPromotedRecipes: allNodeRecipe(
+      sort: { fields: [created] }
       limit: 4
       skip: 3
     ) {
       edges {
         node {
           title
-          fields {
-            slug
+          path {
+            alias
           }
           relationships {
-            category {
+            field_recipe_category {
               name
             }
-            image {
-              relationships {
-                imageFile {
-                  localFile {
-                    childImageSharp {
-                      fluid(maxWidth: 475, maxHeight: 475) {
-                        ...GatsbyImageSharpFluid
-                      }
-                    }
+            field_image {
+              localFile {
+                childImageSharp {
+                  fluid(maxWidth: 475, maxHeight: 475) {
+                    ...GatsbyImageSharpFluid
                   }
                 }
               }
